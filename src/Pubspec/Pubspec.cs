@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace LSymds.Pubspec;
@@ -20,7 +21,7 @@ public record Pubspec
     /// </summary>
     [JsonPropertyName("version")]
     public required string Version { get; init; }
-    
+
     /// <summary>
     /// Gets the description of the package.
     /// <remarks>https://dart.dev/tools/pub/pubspec#homepage</remarks>
@@ -34,21 +35,21 @@ public record Pubspec
     /// </summary>
     [JsonPropertyName("homepage")]
     public string? Homepage { get; init; }
-    
+
     /// <summary>
     /// Gets the URL of the source code repository of the package.
     /// <remarks>https://dart.dev/tools/pub/pubspec#repository</remarks>
     /// </summary>
     [JsonPropertyName("repository")]
     public string? Repository { get; init; }
-    
+
     /// <summary>
     /// Gets the URL of the issue tracker of the package.
     /// <remarks>https://dart.dev/tools/pub/pubspec#issue-tracker</remarks>
     /// </summary>
     [JsonPropertyName("issue_tracker")]
     public string? IssueTracker { get; init; }
-    
+
     /// <summary>
     /// Gets the URL of the documentation of the package.
     /// <remarks>https://dart.dev/tools/pub/pubspec#documentation</remarks>
@@ -61,21 +62,21 @@ public record Pubspec
     /// <remarks>https://dart.dev/tools/pub/pubspec#sdk-constraints</remarks>
     /// </summary>
     [JsonPropertyName("dependencies")]
-    public Dictionary<string, PubspecHostedDependency>? Dependencies { get; init; }
+    public Dictionary<string, PubspecDependency>? Dependencies { get; init; }
 
     /// <summary>
     /// Gets the development dependencies required in order to build and develop this package from source.
     /// <remarks>https://dart.dev/tools/pub/pubspec#sdk-constraints</remarks>
     /// </summary>
     [JsonPropertyName("dev_dependencies")]
-    public Dictionary<string, PubspecHostedDependency>? DevelopmentDependencies { get; init; }
+    public Dictionary<string, PubspecDependency>? DevelopmentDependencies { get; init; }
 
     /// <summary>
     /// Gets the dependency overrides used during the development process.
     /// <remarks>https://dart.dev/tools/pub/pubspec#sdk-constraints</remarks>
     /// </summary>
     [JsonPropertyName("dependency_overrides")]
-    public Dictionary<string, PubspecHostedDependency>? DependencyOverrides { get; init; }
+    public Dictionary<string, PubspecDependency>? DependencyOverrides { get; init; }
 
     /// <summary>
     /// Gets the environmental constraints that the package requires.
@@ -83,14 +84,14 @@ public record Pubspec
     /// </summary>
     [JsonPropertyName("environment")]
     public Dictionary<string, string>? Environment { get; init; }
-    
+
     /// <summary>
     /// Gets the executables that this package provides.
     /// <remarks>https://dart.dev/tools/pub/pubspec#executables</remarks>
     /// </summary>
     [JsonPropertyName("executables")]
     public Dictionary<string, string>? Executables { get; init; }
-    
+
     /// <summary>
     /// Gets the overrides of platforms that this package supports. By default, most hosted repositories will
     /// try to automatically infer this.
@@ -98,17 +99,17 @@ public record Pubspec
     /// </summary>
     [JsonPropertyName("platforms")]
     public Dictionary<string, PubspecPlatform>? Platforms { get; init; }
-    
+
     /// <summary>
     /// Gets the custom package repository that the package will be published to.
     /// <remarks>https://dart.dev/tools/pub/pubspec#publish_to</remarks>
     /// </summary>
     [JsonPropertyName("publish_to")]
     public string? PublishTo { get; init; }
-    
+
     /// <summary>
     /// Gets a collection of URLs that provide information on how users can help fund the development of the package.
-    /// <remarks>https://dart.dev/tools/pub/pubspec#funding</remarks> 
+    /// <remarks>https://dart.dev/tools/pub/pubspec#funding</remarks>
     /// </summary>
     [JsonPropertyName("funding")]
     public IReadOnlyCollection<string> Funding { get; init; }
@@ -120,4 +121,19 @@ public record Pubspec
     /// </summary>
     [JsonExtensionData]
     public Dictionary<string, object> Other { get; set; }
+
+    /// <summary>
+    /// Parses a JSON representation of a Pubspec file into a strongly typed <see cref="Pubspec"/> instance.
+    /// </summary>
+    /// <param name="json">The JSON to parse.</param>
+    public static Pubspec FromJson(string json)
+    {
+        return JsonSerializer.Deserialize<Pubspec>(json, _jsonSerializerOptions)!;
+    }
+
+    private static JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter() },
+    };
 }
